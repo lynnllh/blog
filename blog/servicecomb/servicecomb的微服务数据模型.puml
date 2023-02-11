@@ -1,0 +1,80 @@
+@startuml
+class Microservice {
+  - String serviceId
+  - Framework framework
+  - String registerBy
+  - String environment
+  - String appId
+  - String serviceName
+  - String alias
+  - String version
+  - String description
+  - String level
+  - List<String> schemas
+  - Map<String, String> schemaMap
+  - List<BasePath> paths
+  - MicroserviceStatus status
+  - Map<String, String> properties
+  - MicroserviceInstance instance
+}
+note right of Microservice: 保存一个微服务信息\nserviceId是appId + serviceName + version的唯一索引\nschemas保存了所有的schemaId\nschemaMap简单的保存了所有契约的String类型信息\n一个微服务下可能有多个实例，但是这里只能保存一个
+
+class MicroserviceInstance {
+  - String instanceId
+  - String serviceId
+  - List<String> endpoints
+  - String hostName
+  - MicroserviceInstanceStatus status
+  - Map<String, String> properties
+  - HealthCheck healthCheck
+  - String environment
+  - String stage
+  - DataCenterInfo dataCenterInfo
+  - String timestamp
+}
+note right of MicroserviceInstance: 保存一个微服务实例信息\ninstanceId是一个微服务实例的唯一索引\n正常一个微服务实例只有一个endpoint
+
+
+class MicroserviceVersion {
+  # Version version
+  # Microservice microservice
+}
+note right of MicroserviceVersion: 保存了某个版本的微服务信息\n某个版本下可能有多个实例但是这里只能保存一个实例
+
+class MicroserviceVersions {
+  # AppManager appManager
+  - String appId
+  - String microserviceName
+  - String revision
+  - List<MicroserviceInstance> pulledInstances
+  - boolean safeMode
+  ~ List<MicroserviceInstance> instances
+  ~ Map<String, MicroserviceVersion> versions
+  ~ Map<String, MicroserviceVersionRule> versionRules
+}
+note right of MicroserviceVersions: 保存一个微服务下所有版本的信息\ninstances里保存了所有的微服务实例信息\nversions保存了所有版本的微服务信息
+
+class MicroserviceManager {
+  - AppManager appManager
+  - String appId
+  - Map<String, MicroserviceVersions> versionsByName
+}
+note right of MicroserviceManager: 保存了一个服务下所有微服务的信息
+
+class AppManager {
+  - EventBus eventBus
+  - MicroserviceVersionFactory microserviceVersionFactory
+  - Map<String, MicroserviceManager> apps
+}
+note right of AppManager: 保存了所有服务的信息
+
+
+Microservice "1" o-- "1" MicroserviceInstance
+MicroserviceVersion "1" o-- "1" Microservice
+MicroserviceVersions "1" o-- "*" MicroserviceVersion
+MicroserviceVersions "1" o-- "*" MicroserviceInstance
+MicroserviceManager "1" o-- "*" MicroserviceVersions
+AppManager "1" o-- "*" MicroserviceManager
+MicroserviceVersions "1" o-- "1" AppManager
+MicroserviceManager "1" o-- "1" AppManager
+@enduml
