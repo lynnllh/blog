@@ -1,0 +1,78 @@
+@startuml
+class MicroserviceMeta  {
+  - String appId
+  - String shortName
+  - ClassLoader classLoader
+  - RegisterManager<String, SchemaMeta> idSchemaMetaMgr
+  - Map<Class<?>, List<SchemaMeta>> intfSchemaMetaMgr
+  - Map<String, Object> extData
+  - boolean consumer
+}
+note right of MicroserviceMeta: 保存了微服务的所有契约信息\n一个微服务可能有多个schemaId\n一个schemaId可能有多个operation\n idxxMgr是根据schemaId为key\nintfxxMgr是根据接口为key
+
+class OperationMeta {
+  - SchemaMeta schemaMeta
+  - String schemaQualifiedName
+  - String microserviceQualifiedName
+  - Method method
+  - String httpMethod
+  - String operationPath
+  - Operation swaggerOperation
+  - ResponsesMeta responsesMeta
+  - Map<String, Object> extData
+  - String transport
+  - OperationConfig config
+}
+note right of OperationMeta: 保存了单个方法的契约\n范围小的保存了范围大的所有信息\noperation保存了schema的\nschema的保存了microservice的
+
+class SchemaMeta  {
+  - String packageName
+  - Swagger swagger
+  - MicroserviceMeta microserviceMeta
+  - String microserviceQualifiedName
+  - Class<?> swaggerIntf
+  - List<Handler> consumerHandlerChain
+  - List<Handler> providerHandlerChain
+  - SwaggerToClassGenerator swaggerToClassGenerator
+}
+note right of SchemaMeta: 保存了单个schemaId的所有契约信息\n包括所有方法的契约信息
+
+class CommonService {
+  # String name
+  # RegisterManager<String, OPERATION> operationMgr
+}
+note right of CommonService: 一个类MAP的容器管理类
+
+class ResponsesMeta {
+  - Map<Integer, ResponseMeta> responseMap
+  - ResponseMeta defaultResponse
+}
+
+class ResponseMeta {
+  - JavaType javaType
+  - Map<String, JavaType> headers
+}
+
+class MicroserviceVersion {
+  # Version version
+  # Microservice microservice
+}
+
+class MicroserviceVersionMeta {
+  ~ MicroserviceMeta microserviceMeta
+}
+note right of MicroserviceVersionMeta: 保存了单个版本的微服务的所有契约信息
+
+
+MicroserviceVersion <|-- MicroserviceVersionMeta
+CommonService <|-- MicroserviceMeta
+CommonService <|-- SchemaMeta
+
+ResponsesMeta "1" o-- "1" ResponseMeta
+OperationMeta "1" o-- "1" ResponsesMeta
+OperationMeta "1" o-- "1" SchemaMeta
+SchemaMeta "1" o-- "1" MicroserviceMeta
+MicroserviceMeta "1" o-- "*" SchemaMeta
+MicroserviceVersionMeta "1" o-- "1" MicroserviceMeta
+CommonService "1" o-- "*" OperationMeta
+@enduml
