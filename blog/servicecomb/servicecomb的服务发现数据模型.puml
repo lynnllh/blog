@@ -1,0 +1,46 @@
+@startuml
+class RegistryUtils {
+  - {static} ServiceRegistry serviceRegistry
+}
+
+interface ServiceRegistry {
+}
+
+abstract class AbstractServiceRegistry implements ServiceRegistry {
+  - Features features
+  - MicroserviceFactory microserviceFactory
+  # EventBus eventBus
+  # MicroserviceDefinition microserviceDefinition
+  # Microservice microservice
+  # AppManager appManager
+  # InstanceCacheManager instanceCacheManager
+  # IpPortManager ipPortManager
+  # ServiceRegistryClient srClient
+  # ServiceRegistryConfig serviceRegistryConfig
+  # ServiceCenterTask serviceCenterTask
+}
+
+class RemoteServiceRegistry extends AbstractServiceRegistry {
+  - ScheduledThreadPoolExecutor taskPool
+}
+
+class LocalServiceRegistry extends AbstractServiceRegistry {
+}
+
+interface ServiceRegistryClient {
+}
+
+class ServiceRegistryClientImpl implements ServiceRegistryClient {
+  - IpPortManager ipPortManager
+  - Map<String, Boolean> watchServices
+}
+note right of ServiceRegistryClientImpl: 服务注册客户端\n提供了服务注册的具体实现
+
+class LocalServiceRegistryClientImpl implements ServiceRegistryClient {
+  - Map<String, Microservice> microserviceIdMap
+  - Map<String, Map<String, MicroserviceInstance>> microserviceInstanceMap
+}
+
+RegistryUtils "1" o-- "1" ServiceRegistry
+AbstractServiceRegistry "1" o-- "1" ServiceRegistryClient
+@enduml
