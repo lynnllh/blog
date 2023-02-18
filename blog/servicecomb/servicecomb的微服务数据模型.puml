@@ -52,21 +52,21 @@ class MicroserviceVersions {
   ~ Map<String, MicroserviceVersion> versions
   ~ Map<String, MicroserviceVersionRule> versionRules
 }
-note right of MicroserviceVersions: 保存一个微服务下所有版本的信息\ninstances里保存了所有的微服务实例信息\nversions保存了所有版本的微服务信息
+note right of MicroserviceVersions: 保存一个微服务下所有版本的信息\ninstances里保存了所有的微服务实例信息\nversions保存了所有版本的微服务信息，key为serviceId
 
 class MicroserviceManager {
   - AppManager appManager
   - String appId
   - Map<String, MicroserviceVersions> versionsByName
 }
-note right of MicroserviceManager: 保存了一个服务下所有微服务的信息
+note right of MicroserviceManager: 保存了一个服务下所有微服务的信息，key为microserviceName
 
 class AppManager {
   - EventBus eventBus
   - MicroserviceVersionFactory microserviceVersionFactory
   - Map<String, MicroserviceManager> apps
 }
-note right of AppManager: 保存了所有服务的信息
+note right of AppManager: 保存了所有服务的信息，key为appId
 
 
 Microservice "1" o-- "1" MicroserviceInstance

@@ -1,0 +1,58 @@
+@startuml
+interface Runnable {
+}
+
+class ServiceCenterTask implements Runnable {
+  - EventBus eventBus;
+  - int interval;
+  - int checkTimes;
+  - AtomicLong consecutiveFailedTimes
+  - AtomicLong consecutiveSucceededTimes
+  - boolean safeMode
+  - MicroserviceServiceCenterTask microserviceServiceCenterTask;
+  - boolean registerInstanceSuccess
+  - ServiceCenterTaskMonitor serviceCenterTaskMonitor
+}
+
+class CompositeTask implements Runnable {
+  - List<Runnable> taskList
+}
+
+class MicroserviceServiceCenterTask extends CompositeTask {
+}
+
+abstract class AbstractTask implements Runnable {
+  # TaskStatus taskStatus
+  # EventBus eventBus;
+  # ServiceRegistryClient srClient;
+  # Microservice microservice;
+}
+
+abstract class AbstractRegisterTask extends AbstractTask {
+  # boolean registered;
+}
+
+class MicroserviceInstanceRegisterTask extends AbstractRegisterTask {
+  - ServiceRegistryConfig serviceRegistryConfig;
+  - MicroserviceInstance microserviceInstance;
+}
+
+class MicroserviceRegisterTask extends AbstractRegisterTask {
+  - boolean schemaIdSetMatch;
+}
+
+class MicroserviceInstanceHeartbeatTask extends AbstractTask {
+  - MicroserviceInstance microserviceInstance;
+  - HeartbeatResult heartbeatResult;
+}
+
+class MicroserviceInstanceStatusSyncTask extends AbstractTask {
+}
+
+class MicroserviceWatchTask extends AbstractTask {
+  - ServiceRegistryConfig serviceRegistryConfig;
+}
+
+ServiceCenterTask "1" o-- "1" MicroserviceServiceCenterTask
+CompositeTask "1" o-- "*" Runnable
+@enduml
