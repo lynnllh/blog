@@ -1,0 +1,75 @@
+@startuml
+abstract class AbstractObjectManager<KEY_OWNER, KEY, VALUE> {
+  # Map<KEY, VALUE> objMap
+  # final Object lockObj
+}
+
+abstract class AbstractHandlerManager extends AbstractObjectManager {
+  - String defaultChainDef;
+  - Config config
+}
+
+class ConsumerHandlerManager extends AbstractHandlerManager {
+}
+
+class ProducerHandlerManager extends AbstractHandlerManager {
+}
+
+class Config {
+  - Map<String, Class<Handler>> handlerClassMap
+}
+
+interface Handler {
+}
+
+abstract class BizkeeperHandler implements Handler {
+  # final String groupname;
+  - BizkeeperHandlerDelegate delegate;
+}
+
+class ConsumerBizkeeperHandler extends BizkeeperHandler {
+}
+
+class ProviderBizkeeperHanlder extends BizkeeperHandler {
+}
+
+class ConsumerAuthHandler implements Handler {
+}
+
+class ConsumerQpsFlowControlHandler implements Handler {
+}
+
+class FaultInjectionHandler implements Handler {
+}
+
+class LoadbalanceHandler implements Handler {
+}
+
+class ProducerOperationHandler implements Handler {
+}
+
+class ProviderAuthHanlder implements Handler {
+}
+
+class ProviderQpsFlowControlHandler implements Handler {
+}
+
+class SimpleLoadBalanceHandler implements Handler {
+}
+
+class TransportClientHandler implements Handler {
+}
+
+class ZipkinTracingHandler implements Handler {
+}
+
+class ZipkinConsumerTracingHandler extends ZipkinTracingHandler {
+}
+
+class ZipkinProviderTracingHandler extends ZipkinTracingHandler {
+}
+
+AbstractHandlerManager "1" o-- "1" Config
+Config "1" o-- "*" Handler
+
+@enduml
